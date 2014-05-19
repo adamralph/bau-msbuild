@@ -1,0 +1,10 @@
+bin
+obj
+
+*.suo
+*.user
+
+artifacts
+packages
+
+*.sln.ide
