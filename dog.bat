@@ -1,8 +1,6 @@
 @ECHO OFF
 
-scriptcs -install
-scriptcs baufile.csx
-
+ECHO [Dog] WARNING: Ensure you have built using baufile.csx before building with this!
 ECHO [Dog] WARNING: If anything goes wrong here, you may end up with an altered packages.config. If so, revert the changes before doing anything.
 
 ECHO [Dog] Removing Bau.MSBuild package folder...
