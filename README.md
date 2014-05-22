@@ -2,7 +2,7 @@
 
 > Run MSBuild
 
-[![Gitter chat](https://badges.gitter.im/bau-build/bau.png)](https://gitter.im/bau-build/bau) [![NuGet Status](http://img.shields.io/badge/NuGet-0.1.0~alpha-blue.svg?style=flat)](https://www.nuget.org/packages/Bau.MSBuild/)
+[![Build Status](http://teamcity.codebetter.com/app/rest/builds/buildType:%28id:Bau_BauMSBuild%29/statusIcon)](http://teamcity.codebetter.com/viewType.html?buildTypeId=Bau_BauMSBuild&guest=1) [![Gitter chat](https://badges.gitter.im/bau-build/bau.png)](https://gitter.im/bau-build/bau) [![NuGet Status](http://img.shields.io/badge/NuGet-0.1.0~alpha-blue.svg?style=flat)](https://www.nuget.org/packages/Bau.MSBuild/)
 
 ## Install
 
