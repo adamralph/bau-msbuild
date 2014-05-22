@@ -2,7 +2,7 @@
 
 > Run MSBuild
 
-[![Gitter chat](https://badges.gitter.im/bau-build/bau.png)](https://gitter.im/bau-build/bau)
+[![Gitter chat](https://badges.gitter.im/bau-build/bau.png)](https://gitter.im/bau-build/bau) [![NuGet Status](http://img.shields.io/badge/NuGet-0.1.0~alpha-blue.svg?style=flat)](https://www.nuget.org/packages/Bau.MSBuild/)
 
 ## Install
 
@@ -15,12 +15,12 @@
 ### Examples
 
 ```C#
-// execute the default version of MSBuild.exe using default arguments and switches
+// execute the default version of MSBuild using default arguments and switches
 bau.MSBuild("build");
 ```
 
 ```C#
-// execute a specific version of MSBuild.exe  using custom arguments and switches
+// execute a specific version of MSBuild using custom arguments and switches
 bau.MSBuild("build").Do(exec =>
 {
     msbuild.MSBuildVersion = "net45";
@@ -33,9 +33,9 @@ bau.MSBuild("build").Do(exec =>
 
 #### Properties and arguments
 
-- **MSBuildVersion** `string`: The version of MSBuild to use. For a version which ships with Visual Studio 2013 or later, you can use a Visual Studio Identifier, e.g. `vs12` or `vs2013`. For older versions, use a NuGet style framework identifier, e.g. `net45`. Defaults to `vs2013`.
+- **MSBuildVersion** `string`: The version of MSBuild to use. Defaults to `vs12`. For a version which ships with Visual Studio 2013 or later, you can use a Visual Studio identifier, e.g. for Visual Studio 2013, use `vs12` or `vs2013`. For older versions which shipped with .NET framework releases, use a NuGet style framework identifier, e.g. `net45`.
 
-- **MSBuildArchitecture** [System.Reflection.ProcessorArchitecture](http://msdn.microsoft.com/en-us/library/cc533013.aspx): Controls whether the 64-bit or 32-bit version of MSBuild should be used. The default (`None`/`MSIL`) is the version matching the current OS. `IA64` and `Arm` are not supported. 
+- **MSBuildArchitecture** [System.Reflection.ProcessorArchitecture](http://msdn.microsoft.com/en-us/library/cc533013.aspx): Controls whether the 64-bit or 32-bit version of MSBuild is used. The default (`None`/`MSIL`) is the version matching the current OS. `IA64` and `Arm` are not supported. 
 
 - **WorkingDirectory** `string`
 
