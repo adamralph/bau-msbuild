@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>Bau.MSBuild</id>
+    <!-- The version will be replaced by the build -->
+    <version>0.0.0</version>
+    <title>Bau.MSBuild</title>
+    <authors>Adam Ralph, Bau contributors</authors>
+    <description>A Bau task plugin for running MSBuild.</description>
+    <projectUrl>https://github.com/bau-build/bau-msbuild/</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/bau-build/bau/dev/assets/bau.128.png</iconUrl>
+    <licenseUrl>https://github.com/bau-build/bau-msbuild/blob/dev/license.txt</licenseUrl>
+    <copyright>Copyright (c) Bau contributors. (baubuildch@gmail.com)</copyright>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <tags>C# msbuild build script task target runner rake grunt gulp fake nake jake psake sake</tags>
+  </metadata>
+</package>

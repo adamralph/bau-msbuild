@@ -1,0 +1,26 @@
+<Dictionary>
+  <Words>
+    <Unrecognized>
+      <Word/>
+    </Unrecognized>
+    <Recognized>
+      <Word>Bau</Word>
+      <Word>Cpu</Word>
+      <Word>MSBuild</Word>
+    </Recognized>
+    <Deprecated>
+      <Term PreferredAlternate=""/>
+    </Deprecated>
+    <Compound>
+      <Term CompoundAlternate=""/>
+    </Compound>
+    <DiscreteExceptions>
+      <Term/>
+    </DiscreteExceptions>
+  </Words>
+  <Acronyms>
+    <CasingExceptions>
+      <Acronym/>
+    </CasingExceptions>
+  </Acronyms>
+</Dictionary>
