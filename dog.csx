@@ -28,17 +28,17 @@ Require<Bau>()
     }
 })
 
-.MSBuild("clean").DependsOn("logs").Do(msbuild =>
+.MSBuild("clean").DependsOn("logs").Do(msb =>
 {
-    msbuild.MSBuildVersion = "net45";
-    msbuild.Solution = solution;
-    msbuild.Targets = new[] { "Clean", };
-    msbuild.Properties = new { Configuration = "Release" };
-    msbuild.MaxCpuCount = -1;
-    msbuild.NodeReuse = false;
-    msbuild.Verbosity = Verbosity.Minimal;
-    msbuild.NoLogo = true;
-    msbuild.Args = "/fileLogger /fileloggerparameters:PerformanceSummary;Summary;Verbosity=" + msBuildFileVerbosity + ";LogFile=" + logs + "/clean.log";
+    msb.MSBuildVersion = "net45";
+    msb.Solution = solution;
+    msb.Targets = new[] { "Clean", };
+    msb.Properties = new { Configuration = "Release" };
+    msb.MaxCpuCount = -1;
+    msb.NodeReuse = false;
+    msb.Verbosity = Verbosity.Minimal;
+    msb.NoLogo = true;
+    msb.Args = "/fileLogger /fileloggerparameters:PerformanceSummary;Summary;Verbosity=" + msBuildFileVerbosity + ";LogFile=" + logs + "/clean.log";
 })
 
 .Task("clobber").DependsOn("clean").Do(() =>
@@ -53,17 +53,17 @@ Require<Bau>()
     .Run(nugetCommand)
     .With("restore", solution))
 
-.MSBuild("build").DependsOn("clean", "restore", "logs").Do(msbuild =>
+.MSBuild("build").DependsOn("clean", "restore", "logs").Do(msb =>
 {
-    msbuild.MSBuildVersion = "net45";
-    msbuild.Solution = solution;
-    msbuild.Targets = new[] { "Build", };
-    msbuild.Properties = new { Configuration = "Release" };
-    msbuild.MaxCpuCount = -1;
-    msbuild.NodeReuse = false;
-    msbuild.Verbosity = Verbosity.Minimal;
-    msbuild.NoLogo = true;
-    msbuild.Args = "/fileLogger /fileloggerparameters:PerformanceSummary;Summary;Verbosity=" + msBuildFileVerbosity + ";LogFile=" + logs + "/build.log";
+    msb.MSBuildVersion = "net45";
+    msb.Solution = solution;
+    msb.Targets = new[] { "Build", };
+    msb.Properties = new { Configuration = "Release" };
+    msb.MaxCpuCount = -1;
+    msb.NodeReuse = false;
+    msb.Verbosity = Verbosity.Minimal;
+    msb.NoLogo = true;
+    msb.Args = "/fileLogger /fileloggerparameters:PerformanceSummary;Summary;Verbosity=" + msBuildFileVerbosity + ";LogFile=" + logs + "/build.log";
 })
 
 .Task("tests").Do(() =>
