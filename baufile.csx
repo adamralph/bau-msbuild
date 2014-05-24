@@ -1,22 +1,10 @@
 // parameters
 var versionSuffix = Environment.GetEnvironmentVariable("VERSION_SUFFIX") ?? "-adhoc";
-var msBuildFileVerbosity = Environment.GetEnvironmentVariable("MSBUILD_FILE_VERBOSITY");
-var nugetVerbosity = Environment.GetEnvironmentVariable("NUGET_VERBOSITY");
-
-// parameter defaults
-if (string.IsNullOrWhiteSpace(msBuildFileVerbosity))
-{
-    msBuildFileVerbosity = "normal";
-};
-
-if (string.IsNullOrWhiteSpace(nugetVerbosity))
-{
-    nugetVerbosity = "quiet";
-};
+var msBuildFileVerbosity = (Verbosity)Enum.Parse(typeof(Verbosity), Environment.GetEnvironmentVariable("MSBUILD_FILE_VERBOSITY") ?? "normal", true);
+var nugetVerbosity = Environment.GetEnvironmentVariable("NUGET_VERBOSITY") ?? "quiet";
 
 // solution specific variables
 var version = File.ReadAllText("src/CommonAssemblyInfo.cs").Split(new[] { "AssemblyInformationalVersion(\"" }, 2, StringSplitOptions.None).ElementAt(1).Split(new[] { '"' }).First();
-var msBuildCommand = Path.Combine(Environment.GetEnvironmentVariable("WINDIR"), "Microsoft.NET/Framework/v4.0.30319/MSBuild.exe");
 var nugetCommand = "packages/NuGet.CommandLine.2.8.1/tools/NuGet.exe";
 var xunitCommand = "packages/xunit.runners.1.9.2/tools/xunit.console.clr4.exe";
 var solution = "src/Bau.MSBuild.sln";
@@ -32,106 +20,124 @@ Require<Bau>()
 .Task("default").DependsOn("unit", "pack")
 
 .Task("logs").Do(() =>
+{
+    if (!Directory.Exists(logs))
     {
-        if (!Directory.Exists(logs))
-        {
-            Directory.CreateDirectory(logs);
-            System.Threading.Thread.Sleep(100); // HACK (adamralph): wait for the directory to be created
-        }
-    })
+        Directory.CreateDirectory(logs);
+        System.Threading.Thread.Sleep(100); // HACK (adamralph): wait for the directory to be created
+    }
+})
 
-.Exec("clean").DependsOn("logs").Do(exec => exec
-    .Run(msBuildCommand)
-    .With(
-        solution,
-        "/target:Clean",
-        "/property:Configuration=Release",
-        "/maxcpucount",
-        "/nodeReuse:false",
-        "/fileLogger",
-        "/fileloggerparameters:PerformanceSummary;Summary;Verbosity=" + msBuildFileVerbosity + ";LogFile=" + logs + "/clean.log",
-        "/verbosity:minimal",
-        "/nologo"))
+.MSBuild("clean").DependsOn("logs").Do(msb =>
+{
+    msb.MSBuildVersion = "net45";
+    msb.Solution = solution;
+    msb.Targets = new[] { "Clean", };
+    msb.Properties = new { Configuration = "Release" };
+    msb.MaxCpuCount = -1;
+    msb.NodeReuse = false;
+    msb.Verbosity = Verbosity.Minimal;
+    msb.NoLogo = true;
+    msb.FileLoggers.Add(new FileLogger
+    {
+        FileLoggerParameters = new FileLoggerParameters
+        {
+            PerformanceSummary = true,
+            Summary = true,
+            Verbosity = msBuildFileVerbosity,
+            LogFile = logs + "/clean.log",
+        }
+    });
+})
 
 .Task("clobber").DependsOn("clean").Do(() =>
+{
+    if (Directory.Exists(output))
     {
-        if (Directory.Exists(output))
-        {
-            Directory.Delete(output, true);
-        }
-    })
+        Directory.Delete(output, true);
+    }
+})
 
 .Exec("restore").Do(exec => exec
     .Run(nugetCommand)
     .With("restore", solution))
 
-.Exec("build").DependsOn("clean", "restore", "logs").Do(exec => exec
-    .Run(msBuildCommand)
-    .With(
-        solution,
-        "/target:Build",
-        "/property:Configuration=Release",
-        "/maxcpucount",
-        "/nodeReuse:false",
-        "/fileLogger",
-        "/fileloggerparameters:PerformanceSummary;Summary;Verbosity=" + msBuildFileVerbosity + ";LogFile=" + logs + "/build.log",
-        "/verbosity:minimal",
-        "/nologo"))
+.MSBuild("build").DependsOn("clean", "restore", "logs").Do(msb =>
+{
+    msb.MSBuildVersion = "net45";
+    msb.Solution = solution;
+    msb.Targets = new[] { "Build", };
+    msb.Properties = new { Configuration = "Release" };
+    msb.MaxCpuCount = -1;
+    msb.NodeReuse = false;
+    msb.Verbosity = Verbosity.Minimal;
+    msb.NoLogo = true;
+    msb.FileLoggers.Add(new FileLogger
+    {
+        FileLoggerParameters = new FileLoggerParameters
+        {
+            PerformanceSummary = true,
+            Summary = true,
+            Verbosity = msBuildFileVerbosity,
+            LogFile = logs + "/build.log",
+        }
+    });
+})
 
 .Task("tests").Do(() =>
+{
+    if (!Directory.Exists(tests))
     {
-        if (!Directory.Exists(tests))
-        {
-            Directory.CreateDirectory(tests);
-            System.Threading.Thread.Sleep(100); // HACK (adamralph): wait for the directory to be created
-        }
-    })
+        Directory.CreateDirectory(tests);
+        System.Threading.Thread.Sleep(100); // HACK (adamralph): wait for the directory to be created
+    }
+})
 
 .Exec("unit").DependsOn("build", "tests").Do(exec => exec
     .Run(xunitCommand)
     .With(unit, "/html", GetTestResultsPath(tests, unit, "html"), "/xml", GetTestResultsPath(tests, unit, "xml")))
 
 .Task("output").Do(() =>
+{
+    if (!Directory.Exists(output))
     {
-        if (!Directory.Exists(output))
-        {
-            Directory.CreateDirectory(output);
-            System.Threading.Thread.Sleep(100); // HACK (adamralph): wait for the directory to be created
-        }
-    })
+        Directory.CreateDirectory(output);
+        System.Threading.Thread.Sleep(100); // HACK (adamralph): wait for the directory to be created
+    }
+})
 
 .Task("pack").DependsOn("build", "clobber", "output").Do(() =>
+{
+    foreach (var pack in packs)
+    {
+        File.Copy(pack + ".nuspec", pack + ".nuspec.original", true);
+    }
+
+    try
     {
         foreach (var pack in packs)
         {
-            File.Copy(pack + ".nuspec", pack + ".nuspec.original", true);
+            File.WriteAllText(pack + ".nuspec", File.ReadAllText(pack + ".nuspec").Replace("0.0.0", version + versionSuffix));
+            new Exec()
+                .Run(nugetCommand)
+                .With(
+                    "pack", pack + ".csproj",
+                    "-OutputDirectory", output,
+                    "-Properties", "Configuration=Release",
+                    "-IncludeReferencedProjects",
+                    "-Verbosity " + nugetVerbosity)
+                .Execute();
         }
-
-        try
+    }
+    finally
+    {
+        foreach (var pack in packs)
         {
-            foreach (var pack in packs)
-            {
-                File.WriteAllText(pack + ".nuspec", File.ReadAllText(pack + ".nuspec").Replace("0.0.0", version + versionSuffix));
-                new Exec()
-                    .Run(nugetCommand)
-                    .With(
-                        "pack", pack + ".csproj",
-                        "-OutputDirectory", output,
-                        "-Properties", "Configuration=Release",
-                        "-IncludeReferencedProjects",
-                        "-Verbosity " + nugetVerbosity)
-                    .Execute();
-            }
+            File.Copy(pack + ".nuspec.original", pack + ".nuspec", true);
+            File.Delete(pack + ".nuspec.original");
         }
-        finally
-        {
-            foreach (var pack in packs)
-            {
-                File.Copy(pack + ".nuspec.original", pack + ".nuspec", true);
-                File.Delete(pack + ".nuspec.original");
-            }
-        }
-    })
+    }
+})
 
 .Run();
 
