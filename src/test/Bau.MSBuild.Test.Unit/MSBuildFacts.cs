@@ -8,7 +8,6 @@ namespace BauMSBuild.Test.Unit
     using System.Diagnostics;
     using System.IO;
     using System.Reflection;
-    using System.Text;
     using FluentAssertions;
     using Xunit;
     using Xunit.Extensions;
@@ -522,6 +521,16 @@ namespace BauMSBuild.Test.Unit
             // arrange
             var msbuild = new Derived();
 
+            // defaults
+            msbuild.FileLoggers.Add(new FileLogger());
+
+            // default parameters
+            msbuild.FileLoggers.Add(new FileLogger
+            {
+                FileLoggerParameters = new FileLoggerParameters(),
+            });
+
+            // no number
             msbuild.FileLoggers.Add(new FileLogger
             {
                 Number = null,
@@ -547,6 +556,7 @@ namespace BauMSBuild.Test.Unit
                 }
             });
 
+            // the lot
             msbuild.FileLoggers.Add(new FileLogger
             {
                 Number = 1,
@@ -603,6 +613,10 @@ namespace BauMSBuild.Test.Unit
             });
 
             var expectedArgs =
+                "/fileLogger" +
+                " " +
+                "/fileLogger" +
+                " " +
                 "/fileLogger /fileloggerparameters:DisableConsoleColor;DisableMPLogging;EnableMPLogging;" +
                 "ErrorsOnly;ForceNoAlign;NoItemAndPropertyList;NoSummary;PerformanceSummary;ShowCommandLine;" +
                 "ShowEventId;ShowTimestamp;Summary;WarningsOnly;Append=true;Encoding=UTF-8;LogFile=logfile.txt;verbosity=minimal" +

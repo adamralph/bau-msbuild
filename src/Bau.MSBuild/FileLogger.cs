@@ -14,10 +14,12 @@ namespace BauMSBuild
 
         public string Render()
         {
+            var parameters = this.FileLoggerParameters == null ? null : this.FileLoggerParameters.Render(this.Number);
+
             return string.Concat(
                 "/fileLogger",
                 this.Number.HasValue ? this.Number.Value.ToString(CultureInfo.InvariantCulture) : null,
-                this.FileLoggerParameters == null ? null : " " + this.FileLoggerParameters.Render(this.Number));
+                string.IsNullOrWhiteSpace(parameters) ? null : " " + parameters);
         }
     }
 }

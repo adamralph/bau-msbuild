@@ -1,6 +1,6 @@
 // parameters
 var versionSuffix = Environment.GetEnvironmentVariable("VERSION_SUFFIX") ?? "-adhoc";
-var msBuildFileVerbosity = Environment.GetEnvironmentVariable("MSBUILD_FILE_VERBOSITY") ?? "normal";
+var msBuildFileVerbosity = (Verbosity)Enum.Parse(typeof(Verbosity), Environment.GetEnvironmentVariable("MSBUILD_FILE_VERBOSITY") ?? "normal", true);
 var nugetVerbosity = Environment.GetEnvironmentVariable("NUGET_VERBOSITY") ?? "quiet";
 
 // solution specific variables
@@ -38,7 +38,16 @@ Require<Bau>()
     msb.NodeReuse = false;
     msb.Verbosity = Verbosity.Minimal;
     msb.NoLogo = true;
-    msb.Args = "/fileLogger /fileloggerparameters:PerformanceSummary;Summary;Verbosity=" + msBuildFileVerbosity + ";LogFile=" + logs + "/clean.log";
+    msb.FileLoggers.Add(new FileLogger
+    {
+        FileLoggerParameters = new FileLoggerParameters
+        {
+            PerformanceSummary = true,
+            Summary = true,
+            Verbosity = msBuildFileVerbosity,
+            LogFile = logs + "/clean.log",
+        }
+    });
 })
 
 .Task("clobber").DependsOn("clean").Do(() =>
@@ -63,7 +72,16 @@ Require<Bau>()
     msb.NodeReuse = false;
     msb.Verbosity = Verbosity.Minimal;
     msb.NoLogo = true;
-    msb.Args = "/fileLogger /fileloggerparameters:PerformanceSummary;Summary;Verbosity=" + msBuildFileVerbosity + ";LogFile=" + logs + "/build.log";
+    msb.FileLoggers.Add(new FileLogger
+    {
+        FileLoggerParameters = new FileLoggerParameters
+        {
+            PerformanceSummary = true,
+            Summary = true,
+            Verbosity = msBuildFileVerbosity,
+            LogFile = logs + "/build.log",
+        }
+    });
 })
 
 .Task("tests").Do(() =>
