@@ -54,7 +54,7 @@ namespace BauMSBuild
                 .OrderBy(name => name);
 
             var strings = this.GetType().GetProperties()
-                .Where(property => property.PropertyType == typeof(string))
+                .Where(property => property.PropertyType == typeof(string) && property.GetValue(this) != null)
                 .Select(property => string.Concat(property.Name, "=", (string)property.GetValue(this)))
                 .OrderBy(name => name);
 
