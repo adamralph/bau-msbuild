@@ -6,7 +6,9 @@
     <version>0.0.0</version>
     <title>Bau.MSBuild</title>
     <authors>Adam Ralph, Bau contributors</authors>
-    <description>A Bau task plugin for running MSBuild.</description>
+    <description>A Bau task plugin for running MSBuild.
+
+Require&lt;Bau&gt;().MSBuild().Run();</description>
     <projectUrl>https://github.com/bau-build/bau-msbuild/</projectUrl>
     <iconUrl>https://raw.githubusercontent.com/bau-build/bau/dev/assets/bau.128.png</iconUrl>
     <licenseUrl>https://github.com/bau-build/bau-msbuild/blob/dev/license.txt</licenseUrl>

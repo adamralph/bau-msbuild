@@ -21,13 +21,13 @@ bau.MSBuild("build");
 
 ```C#
 // execute a specific version of MSBuild using custom arguments and switches
-bau.MSBuild("build").Do(exec =>
+bau.MSBuild("build").Do(msb =>
 {
-    msbuild.MSBuildVersion = "net45";
-	msbuild.MSBuildArchitecture = ProcessorArchitecture.X86;
-    msbuild.Solution = solution;
-    msbuild.Targets = new[] { "Clean", "Build", };
-    msbuild.Properties = new { Configuration = "Release" };
+    msb.MSBuildVersion = "net45";
+    msb.MSBuildArchitecture = ProcessorArchitecture.X86;
+    msb.Solution = solution;
+    msb.Targets = new[] { "Clean", "Build", };
+    msb.Properties = new { Configuration = "Release" };
 });
 ```
 
