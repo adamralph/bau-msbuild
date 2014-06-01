@@ -56,7 +56,7 @@
   <ItemGroup>
     <Reference Include="Bau, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Bau.0.1.0-alpha14\lib\net45\Bau.dll</HintPath>
+      <HintPath>..\packages\Bau.0.1.0-beta01\lib\net45\Bau.dll</HintPath>
     </Reference>
     <Reference Include="ScriptCs.Contracts">
       <HintPath>..\packages\ScriptCs.Contracts.0.9.0\lib\net45\ScriptCs.Contracts.dll</HintPath>
