@@ -1,6 +1,6 @@
 // parameters
 var versionSuffix = Environment.GetEnvironmentVariable("VERSION_SUFFIX") ?? "-adhoc";
-var msBuildFileVerbosity = (Verbosity)Enum.Parse(typeof(Verbosity), Environment.GetEnvironmentVariable("MSBUILD_FILE_VERBOSITY") ?? "normal", true);
+var msBuildFileVerbosity = (Verbosity)Enum.Parse(typeof(Verbosity), Environment.GetEnvironmentVariable("MSBUILD_FILE_VERBOSITY") ?? "minimal", true);
 var nugetVerbosity = Environment.GetEnvironmentVariable("NUGET_VERBOSITY") ?? "quiet";
 
 // solution specific variables
@@ -12,21 +12,15 @@ var output = "artifacts/output";
 var tests = "artifacts/tests";
 var logs = "artifacts/logs";
 var unit = "src/test/Bau.MSBuild.Test.Unit/bin/Release/Bau.MSBuild.Test.Unit.dll";
-var packs = new[] { "src/Bau.MSBuild/Bau.MSBuild", };
+var pack = "src/Bau.MSBuild/Bau.MSBuild";
 
 // solution agnostic tasks
-Require<Bau>()
+var bau = Require<Bau>();
 
+bau
 .Task("default").DependsOn("unit", "pack")
 
-.Task("logs").Do(() =>
-{
-    if (!Directory.Exists(logs))
-    {
-        Directory.CreateDirectory(logs);
-        System.Threading.Thread.Sleep(100); // HACK (adamralph): wait for the directory to be created
-    }
-})
+.Task("logs").Do(() => CreateDirectory(logs))
 
 .MSBuild("clean").DependsOn("logs").Do(msb =>
 {
@@ -50,13 +44,7 @@ Require<Bau>()
     });
 })
 
-.Task("clobber").DependsOn("clean").Do(() =>
-{
-    if (Directory.Exists(output))
-    {
-        Directory.Delete(output, true);
-    }
-})
+.Task("clobber").DependsOn("clean").Do(() => DeleteDirectory(output))
 
 .Exec("restore").Do(exec => exec
     .Run(nugetCommand)
@@ -84,70 +72,38 @@ Require<Bau>()
     });
 })
 
-.Task("tests").Do(() =>
-{
-    if (!Directory.Exists(tests))
-    {
-        Directory.CreateDirectory(tests);
-        System.Threading.Thread.Sleep(100); // HACK (adamralph): wait for the directory to be created
-    }
-})
+.Task("tests").Do(() => CreateDirectory(tests))
 
-.Exec("unit").DependsOn("build", "tests").Do(exec => exec
-    .Run(xunitCommand)
-    .With(unit, "/html", GetTestResultsPath(tests, unit, "html"), "/xml", GetTestResultsPath(tests, unit, "xml")))
+.Xunit("unit").DependsOn("build", "tests").Do(xunit => xunit
+    .Use(xunitCommand).Run(unit).Html().Xml())
 
-.Task("output").Do(() =>
-{
-    if (!Directory.Exists(output))
-    {
-        Directory.CreateDirectory(output);
-        System.Threading.Thread.Sleep(100); // HACK (adamralph): wait for the directory to be created
-    }
-})
+.Task("output").Do(() => CreateDirectory(output))
 
-.Task("pack").DependsOn("build", "clobber", "output").Do(() =>
-{
-    foreach (var pack in packs)
-    {
-        File.Copy(pack + ".nuspec", pack + ".nuspec.original", true);
-    }
-
-    try
-    {
-        foreach (var pack in packs)
-        {
-            File.WriteAllText(pack + ".nuspec", File.ReadAllText(pack + ".nuspec").Replace("0.0.0", version + versionSuffix));
-            new Exec()
-                .Run(nugetCommand)
-                .With(
-                    "pack", pack + ".csproj",
-                    "-OutputDirectory", output,
-                    "-Properties", "Configuration=Release",
-                    "-IncludeReferencedProjects",
-                    "-Verbosity " + nugetVerbosity)
-                .Execute();
-        }
-    }
-    finally
-    {
-        foreach (var pack in packs)
-        {
-            File.Copy(pack + ".nuspec.original", pack + ".nuspec", true);
-            File.Delete(pack + ".nuspec.original");
-        }
-    }
-})
+.Exec("pack").DependsOn("build", "clobber", "output").Do(exec => exec
+    .Run(nugetCommand)
+    .With(
+        "pack", pack + ".csproj",
+        "-OutputDirectory", output,
+        "-Properties", "Configuration=Release",
+        "-IncludeReferencedProjects",
+        "-Verbosity", nugetVerbosity,
+        "-Version", version + versionSuffix))
 
 .Run();
 
-string GetTestResultsPath(string directory, string assembly, string extension)
+void CreateDirectory(string name)
 {
-    return Path.GetFullPath(
-        Path.Combine(
-            directory,
-            string.Concat(
-                Path.GetFileNameWithoutExtension(assembly),
-                ".TestResults.",
-                extension)));
+    if (!Directory.Exists(name))
+    {
+        Directory.CreateDirectory(name);
+        System.Threading.Thread.Sleep(100); // HACK (adamralph): wait for the directory to be created
+    }
+}
+
+void DeleteDirectory(string name)
+{
+    if (Directory.Exists(name))
+    {
+        Directory.Delete(name, true);
+    }
 }

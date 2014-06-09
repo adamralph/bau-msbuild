@@ -75,10 +75,7 @@ bau
 .Task("tests").Do(() => CreateDirectory(tests))
 
 .Xunit("unit").DependsOn("build", "tests").Do(xunit => xunit
-    .UseExe(xunitCommand)
-    .RunAssemblies(unit)
-    .OutputHtml("{0}.TestResults.html")
-    .OutputXml("{0}.TestResults.xml"))
+    .Use(xunitCommand).Run(unit).Html().Xml())
 
 .Task("output").Do(() => CreateDirectory(output))
 
