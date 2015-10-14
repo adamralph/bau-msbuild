@@ -24,6 +24,9 @@ namespace BauMSBuild.Test.Unit
         [InlineData("vs2013", "12.0")]
 
         [InlineData("vs13", "13.0")]
+        
+        [InlineData("vs14", "14.0")]
+        [InlineData("vs2015", "14.0")]
         public static void DeterminesVisualStudioFolder(string version, string subfolder)
         {
             // arrange

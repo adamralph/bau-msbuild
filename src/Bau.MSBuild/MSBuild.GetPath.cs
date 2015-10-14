@@ -81,6 +81,10 @@ namespace BauMSBuild
                 case "VS2013":
                     return GetVisualStudioPath("12.0", architecture, programFilesFolder, is64BitOperatingSystem);
 
+                case "VS14":
+                case "VS2015":
+                    return GetVisualStudioPath("14.0", architecture, programFilesFolder, is64BitOperatingSystem);
+
                 default:
                     if (upperVersion.StartsWith("VS", StringComparison.OrdinalIgnoreCase))
                     {
