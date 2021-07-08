@@ -5,6 +5,7 @@ obj
 *.user
 
 artifacts
-packages
+src/packages
+scriptcs_packages
 
 *.sln.ide
